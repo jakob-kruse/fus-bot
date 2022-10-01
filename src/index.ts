@@ -55,6 +55,9 @@ async function startStream() {
 		[]
 	)
 
+	console.log(`Ignoring words: ${ignoredWords.join(', ')}`)
+	console.log(`Ignoring users: ${ignoredUsers.join(', ')}`)
+
 	client
 		.stream('statuses/filter', parameters)
 		.on('data', (tweet) => {
