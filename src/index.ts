@@ -63,13 +63,14 @@ async function startStream() {
 		.on('data', (tweet) => {
 			if (tweet.user.id_st !== process.env.OWNER_ID && !tweet.retweeted_status) {
 				console.log(`Got new tweet...`)
+				const tweetURL = `https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`
 
 				if (ignoredWords.some((word) => tweet.text.toLowerCase().includes(word))) {
-					console.log(`Ignoring tweet by word. ${tweet.id_str}`)
+					console.log(`Ignoring tweet by word. ${tweetURL}`)
 				} else if (ignoredUsers.includes(tweet.user.screen_name)) {
-					console.log(`Ignoring tweet by user. ${tweet.id_str}`)
+					console.log(`Ignoring tweet by user. ${tweetURL}`)
 				} else {
-					console.log(`Retweeting tweet ${tweet.id_str}`)
+					console.log(`Retweeting tweet ${tweetURL}`)
 
 					client.post(`statuses/retweet/${tweet.id_str}`, {}).catch(console.error)
 				}
