@@ -1,4 +1,4 @@
-import { getStreamParams } from './cms'
+import { cms, getIgnoreRules, getStreamParams } from './cms'
 import { isFiltered } from './filter'
 import { retweet, startStream } from './twitter'
 
@@ -31,7 +31,10 @@ async function start() {
 			onTweet: async (tweet) => {
 				const filtered = await isFiltered(tweet)
 
-				if (!filtered) {
+				if (filtered) {
+					console.log(`Filtered tweet: @${tweet.user.screen_name} - ${tweet.text}`)
+				} else {
+					console.log(`Retweeting tweet: @${tweet.user.screen_name} - ${tweet.text}`)
 					await retweet(tweet.id_str)
 				}
 			},

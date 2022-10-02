@@ -35,9 +35,11 @@ export async function ensureAuth() {
 export async function getIgnoreRules() {
 	await ensureAuth()
 
-	const cmsResponse = await cms.items('fus_bot_ignore_rules').readByQuery({})
+	const cmsResponse = await cms.items('fus_bot_ignore_rules').readByQuery({
+		limit: -1,
+	})
 
-	return cmsResponse.data?.filter((rule) => !!rule) as CMSTypeMap['fus_bot_ignore_rules'][]
+	return cmsResponse.data as CMSTypeMap['fus_bot_ignore_rules'][]
 }
 
 export async function getStreamParams() {

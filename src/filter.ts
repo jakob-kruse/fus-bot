@@ -16,14 +16,18 @@ export async function isFiltered(tweet: TwitterTweet) {
 
 	return ignoreRules.some((rule) => {
 		if (rule.screen_name && rule.screen_name === tweet.user.screen_name) {
+			console.log(`Matched screen name rule: ${rule.screen_name}`)
+
 			return true
 		}
 
 		if (rule.regex && new RegExp(rule.regex).test(tweet.text)) {
+			console.log(`Matched regex rule: ${rule.regex}`)
 			return true
 		}
 
 		if (rule.contains && tweet.text.toLowerCase().includes(rule.contains.toLowerCase())) {
+			console.log(`Matched contains rule: ${rule.contains}`)
 			return true
 		}
 
