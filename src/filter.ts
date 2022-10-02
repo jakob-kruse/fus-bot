@@ -3,7 +3,7 @@ import { twitterEnv } from './env'
 import { TwitterTweet } from './types'
 
 export async function isFiltered(tweet: TwitterTweet) {
-	if (tweet.user.id_str === twitterEnv.OWNER_ID) {
+	if (tweet.user.id_str === twitterEnv.OWNER_ID || !!tweet.retweeted_status) {
 		return true
 	}
 

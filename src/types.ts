@@ -5,6 +5,7 @@ export type TwitterTweet = {
 		id_str: string
 		screen_name: string
 	}
+	retweeted_status: TwitterTweet | null
 }
 
 export type TwitterStreamParams = Partial<{
