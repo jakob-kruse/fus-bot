@@ -21,7 +21,7 @@ export async function isFiltered(tweet: TwitterTweet) {
 			return true
 		}
 
-		if (rule.regex && new RegExp(rule.regex).test(tweet.text)) {
+		if (rule.regex && new RegExp(rule.regex).test(tweet.text.toLowerCase())) {
 			console.log(`Matched regex rule: ${rule.regex}`)
 			return true
 		}
