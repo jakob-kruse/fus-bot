@@ -18,7 +18,6 @@ export type CMSTypeMap = {
 	fus_bot_parameters: TwitterStreamParams
 	tweets: {
 		id: string
-		filtered: boolean
 		text: string
 		user_id: string
 		raw: string
@@ -68,14 +67,13 @@ export async function getStreamParams() {
 	return cmsResponse.data as TwitterStreamParams
 }
 
-export async function saveTweet(tweet: TwitterTweet, filtered: boolean) {
+export async function saveTweet(tweet: TwitterTweet) {
 	await ensureAuth()
 
 	return await cms.items('tweets').createOne({
 		id: tweet.id_str,
 		text: tweet.text,
 		user_id: tweet.user.id_str,
-		filtered,
 		raw: JSON.stringify(tweet),
 	})
 }
