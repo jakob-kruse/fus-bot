@@ -1,7 +1,7 @@
-import { cms, getIgnoreRules, getStreamParams, saveTweet } from './cms'
+import { cms, getIgnoreRules, getStreamParams, ignoreUserById, saveTweet } from './cms'
 import { isFiltered } from './filter'
 import { logger } from './logger'
-import { retweet, startStream } from './twitter'
+import { getNewMessages, retweet, startStream, twitter } from './twitter'
 import { TwitterTweet } from './types'
 
 const streamLog = logger.child({ module: 'stream' })
@@ -50,6 +50,34 @@ async function start() {
 	}
 
 	streamLog.info('Starting stream with parameters: %o', streamParams)
+
+	setInterval(async () => {
+		const newMessages = await getNewMessages()
+
+		if (newMessages.length > 0) {
+			streamLog.info('Found %s new messages', newMessages.length)
+
+			for (const message of newMessages) {
+				await ignoreUserById(message.message_create.sender_id)
+
+				streamLog.info('Ignored user %s', message.message_create.sender_id)
+
+				await twitter.post('direct_messages/events/create', {
+					event: {
+						type: 'message_create',
+						message_create: {
+							target: {
+								recipient_id: message.message_create.sender_id,
+							},
+							message_data: {
+								text: 'Du wirst nun nicht mehr retweetet',
+							},
+						},
+					},
+				})
+			}
+		}
+	}, 1000 * 60 * 5)
 
 	startStream({
 		params: streamParams,

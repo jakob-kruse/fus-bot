@@ -1,5 +1,4 @@
 node_modules/
 .env
-ignored_users.txt
-ignored_words.txt
 logs
+last-message-timestamp.txt

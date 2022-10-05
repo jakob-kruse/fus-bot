@@ -34,6 +34,11 @@ export async function isFiltered(tweet: TwitterTweet) {
 	const screenName = tweet.user.screen_name.toLowerCase()
 
 	for (const rule of ignoreRules) {
+		if (rule.user_id && rule.user_id === tweet.user.id_str) {
+			filterLog.trace('Rule [%s] matched. user_id === %s', rule.id, tweet.user.id_str)
+			return true
+		}
+
 		if (rule.screen_name && rule.screen_name === screenName) {
 			filterLog.trace('Rule [%s] matched. screen_name === %s', rule.id, screenName)
 			return true

@@ -12,7 +12,8 @@ export type CMSTypeMap = {
 		screen_name: string | null
 		screen_name_regex: string | null
 		regex: string | null
-		contains: 'string | null '
+		contains: string | null
+		user_id: string | null
 	}
 	fus_bot_parameters: TwitterStreamParams
 	tweets: {
@@ -77,4 +78,26 @@ export async function saveTweet(tweet: TwitterTweet, filtered: boolean) {
 		filtered,
 		raw: JSON.stringify(tweet),
 	})
+}
+
+export async function ignoreUserById(id: string) {
+	await ensureAuth()
+
+	const existing = await cms.items('fus_bot_ignore_rules').readByQuery({
+		filter: {
+			user_id: {
+				_eq: id,
+			},
+		},
+	})
+
+	if (existing?.data && existing.data.length > 0) {
+		return false
+	}
+
+	await cms.items('fus_bot_ignore_rules').createOne({
+		user_id: id,
+	})
+
+	return true
 }
