@@ -81,13 +81,18 @@ export async function saveTweet(tweet: TwitterTweet) {
 export async function ignoreUserById(id: string) {
 	await ensureAuth()
 
-	const existing = await cms.items('fus_bot_ignore_rules').readByQuery({
-		filter: {
-			user_id: {
-				_eq: id,
+	const existing = await cms
+		.items('fus_bot_ignore_rules')
+		.readByQuery({
+			filter: {
+				user_id: {
+					_eq: id,
+				},
 			},
-		},
-	})
+		})
+		.catch(() => {
+			cmsLogger.error('Failed to get existing ignore rules')
+		})
 
 	cmsLogger.debug('Existing ignore rules: %o', existing)
 
@@ -95,9 +100,14 @@ export async function ignoreUserById(id: string) {
 		return false
 	}
 
-	await cms.items('fus_bot_ignore_rules').createOne({
-		user_id: id,
-	})
+	await cms
+		.items('fus_bot_ignore_rules')
+		.createOne({
+			user_id: id,
+		})
+		.catch(() => {
+			cmsLogger.error('Failed to create ignore rule')
+		})
 
 	return true
 }
