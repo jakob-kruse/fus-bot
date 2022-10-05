@@ -38,9 +38,9 @@ function onPing() {
 async function checkForIgnoreMessages() {
 	const newMessages = await getNewMessages()
 
-	if (newMessages.length > 0) {
-		streamLog.info('Found %s new messages', newMessages.length)
+	streamLog.info('Found %s new messages', newMessages.length)
 
+	if (newMessages.length > 0) {
 		for (const message of newMessages) {
 			await ignoreUserById(message.message_create.sender_id)
 

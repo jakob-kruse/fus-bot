@@ -2,6 +2,9 @@ import Twitter from 'twitter-lite'
 import { twitterEnv } from './env'
 import { TwitterTweet, TwitterStreamParams } from './types'
 import { promises as fs } from 'fs'
+import { logger } from './logger'
+
+const twitterLogger = logger.child({ module: 'twitter' })
 
 export const twitter = new Twitter({
 	consumer_key: twitterEnv.CONSUMER_KEY,
@@ -42,6 +45,9 @@ export async function getNewMessages() {
 	if (!messageRes?.events) {
 		return []
 	}
+
+	twitterLogger.debug('Found %s messages', messageRes.events.length)
+	twitterLogger.trace('Messages: %o', messageRes.events)
 
 	let messages = messageRes.events.filter(
 		(event) =>
