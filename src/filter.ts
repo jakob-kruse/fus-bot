@@ -25,7 +25,7 @@ export async function isFiltered(tweet: TwitterTweet) {
 		return false
 	}
 
-	const tweetText = tweet.text.toLowerCase()
+	const tweetText = tweet.text.toLowerCase().split('\n').join(' ').trim()
 	const screenName = tweet.user.screen_name.toLowerCase()
 
 	for (const rule of ignoreRules) {
