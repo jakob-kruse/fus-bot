@@ -35,6 +35,34 @@ function onPing() {
 	streamLog.debug('Ping')
 }
 
+async function checkForIgnoreMessages() {
+	const newMessages = await getNewMessages()
+
+	if (newMessages.length > 0) {
+		streamLog.info('Found %s new messages', newMessages.length)
+
+		for (const message of newMessages) {
+			await ignoreUserById(message.message_create.sender_id)
+
+			streamLog.info('Ignored user %s', message.message_create.sender_id)
+
+			await twitter.post('direct_messages/events/create', {
+				event: {
+					type: 'message_create',
+					message_create: {
+						target: {
+							recipient_id: message.message_create.sender_id,
+						},
+						message_data: {
+							text: 'Du wirst nun nicht mehr retweetet',
+						},
+					},
+				},
+			})
+		}
+	}
+}
+
 async function start() {
 	const streamParameters = await getStreamParams()
 
@@ -56,32 +84,10 @@ async function start() {
 
 	streamLog.info('Starting stream with parameters: %o', streamParams)
 
+	await checkForIgnoreMessages()
+
 	setInterval(async () => {
-		const newMessages = await getNewMessages()
-
-		if (newMessages.length > 0) {
-			streamLog.info('Found %s new messages', newMessages.length)
-
-			for (const message of newMessages) {
-				await ignoreUserById(message.message_create.sender_id)
-
-				streamLog.info('Ignored user %s', message.message_create.sender_id)
-
-				await twitter.post('direct_messages/events/create', {
-					event: {
-						type: 'message_create',
-						message_create: {
-							target: {
-								recipient_id: message.message_create.sender_id,
-							},
-							message_data: {
-								text: 'Du wirst nun nicht mehr retweetet',
-							},
-						},
-					},
-				})
-			}
-		}
+		await checkForIgnoreMessages()
 	}, 1000 * 60 * 5)
 
 	startStream({
