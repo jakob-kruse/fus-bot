@@ -1,17 +1,43 @@
 import { cms, getIgnoreRules, getStreamParams } from './cms'
 import { isFiltered } from './filter'
+import { logger } from './logger'
 import { retweet, startStream } from './twitter'
+import { TwitterTweet } from './types'
+
+const streamLog = logger.child({ module: 'stream' })
+
+async function onTweet(tweet: TwitterTweet) {
+	streamLog.trace('Recieved tweet: %o', tweet)
+
+	const filtered = await isFiltered(tweet)
+
+	if (!filtered) {
+		await retweet(tweet.id_str)
+	}
+}
+
+function onError(error: Error) {
+	streamLog.error('Error: %o', error)
+}
+
+function onEnd() {
+	streamLog.info('Ended')
+}
+
+function onPing() {
+	streamLog.trace('Ping')
+}
 
 async function start() {
 	const streamParameters = await getStreamParams()
 
 	if (!streamParameters) {
-		console.log('ERROR: No stream parameters found')
+		streamLog.error('No stream parameters found')
 		return
 	}
 
 	if (!streamParameters.track) {
-		console.log('ERROR: No track parameters found')
+		streamLog.error('No track parameter found')
 		return
 	}
 
@@ -21,23 +47,15 @@ async function start() {
 		language: streamParameters.language ?? 'de',
 	}
 
-	console.log('Starting stream with parameters:', streamParams)
+	streamLog.info('Starting stream with parameters: %o', streamParams)
 
 	startStream({
 		params: streamParams,
 		events: {
-			onEnd: console.log,
-			onError: console.log,
-			onTweet: async (tweet) => {
-				const filtered = await isFiltered(tweet)
-
-				if (filtered) {
-					console.log(`Filtered tweet: @${tweet.user.screen_name} - ${tweet.text}`)
-				} else {
-					console.log(`Retweeting tweet: @${tweet.user.screen_name} - ${tweet.text}`)
-					await retweet(tweet.id_str)
-				}
-			},
+			onEnd,
+			onError,
+			onPing,
+			onTweet,
 		},
 	})
 }

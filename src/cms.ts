@@ -1,12 +1,16 @@
 import { Directus } from '@directus/sdk'
 import { cmsEnv } from './env'
+import { logger } from './logger'
 import { TwitterStreamParams } from './types'
+
+const cmsLogger = logger.child({ module: 'cms' })
 
 export type CMSTypeMap = {
 	fus_bot_ignore_rules: {
 		id: number
 		status: 'published' | 'draft' | 'archived'
 		screen_name: string | null
+		screen_name_regex: string | null
 		regex: string | null
 		contains: 'string | null '
 	}
@@ -16,20 +20,24 @@ export type CMSTypeMap = {
 export const cms: Directus<CMSTypeMap> = new Directus<CMSTypeMap>(cmsEnv.CMS_URL)
 
 export async function ensureAuth() {
-	let isAuth = false
 	await cms.auth
 		.refresh()
 		.then(() => {
-			isAuth = true
+			cmsLogger.debug('Auth is still valid')
 		})
-		.catch(() => {})
+		.catch(async () => {
+			cmsLogger.debug('Refreshing Auth')
 
-	if (!isAuth) {
-		await cms.auth.login({
-			email: cmsEnv.CMS_EMAIL,
-			password: cmsEnv.CMS_PASSWORD,
+			await cms.auth
+				.login({
+					email: cmsEnv.CMS_EMAIL,
+					password: cmsEnv.CMS_PASSWORD,
+				})
+				.catch(() => {
+					cmsLogger.error('Failed to login to CMS')
+					process.exit(1)
+				})
 		})
-	}
 }
 
 export async function getIgnoreRules() {
