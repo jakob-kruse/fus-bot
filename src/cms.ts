@@ -1,7 +1,7 @@
 import { Directus } from '@directus/sdk'
 import { cmsEnv } from './env'
 import { logger } from './logger'
-import { TwitterStreamParams } from './types'
+import { TwitterStreamParams, TwitterTweet } from './types'
 
 const cmsLogger = logger.child({ module: 'cms' })
 
@@ -15,6 +15,13 @@ export type CMSTypeMap = {
 		contains: 'string | null '
 	}
 	fus_bot_parameters: TwitterStreamParams
+	tweets: {
+		id: string
+		filtered: boolean
+		text: string
+		user_id: string
+		raw: string
+	}
 }
 
 export const cms: Directus<CMSTypeMap> = new Directus<CMSTypeMap>(cmsEnv.CMS_URL)
@@ -58,4 +65,16 @@ export async function getStreamParams() {
 	})
 
 	return cmsResponse.data as TwitterStreamParams
+}
+
+export async function saveTweet(tweet: TwitterTweet, filtered: boolean) {
+	await ensureAuth()
+
+	return await cms.items('tweets').createOne({
+		id: tweet.id_str,
+		text: tweet.text,
+		user_id: tweet.user.id_str,
+		filtered,
+		raw: JSON.stringify(tweet),
+	})
 }

@@ -1,4 +1,4 @@
-import { cms, getIgnoreRules, getStreamParams } from './cms'
+import { cms, getIgnoreRules, getStreamParams, saveTweet } from './cms'
 import { isFiltered } from './filter'
 import { logger } from './logger'
 import { retweet, startStream } from './twitter'
@@ -10,6 +10,8 @@ async function onTweet(tweet: TwitterTweet) {
 	streamLog.trace('Recieved tweet: [%s] @%s "%s"', tweet.id_str, tweet.user.screen_name, tweet.text)
 
 	const filtered = await isFiltered(tweet)
+
+	await saveTweet(tweet, filtered)
 
 	if (!filtered) {
 		await retweet(tweet.id_str)
