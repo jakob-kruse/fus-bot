@@ -23,11 +23,7 @@ function onError(error: Error) {
 
 function onEnd() {
 	streamLog.info('Ended')
-
-	setTimeout(() => {
-		streamLog.info('Restarting stream')
-		start()
-	}, 5000)
+	process.exit(1)
 }
 
 function onPing() {
@@ -89,15 +85,19 @@ async function start() {
 
 	streamLog.info('Starting stream with parameters: %o', streamParams)
 
-	startStream({
-		params: streamParams,
-		events: {
-			onEnd,
-			onError,
-			onPing,
-			onTweet,
-		},
-	})
+	try {
+		startStream({
+			params: streamParams,
+			events: {
+				onEnd,
+				onError,
+				onPing,
+				onTweet,
+			},
+		})
+	} catch (error) {
+		process.exit(1)
+	}
 }
 
 start()
