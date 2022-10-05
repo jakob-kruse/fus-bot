@@ -81,13 +81,13 @@ async function start() {
 		language: streamParameters.language ?? 'de',
 	}
 
-	streamLog.info('Starting stream with parameters: %o', streamParams)
-
 	await checkForIgnoreMessages()
 
 	setInterval(async () => {
 		await checkForIgnoreMessages()
 	}, 1000 * 60 * 5)
+
+	streamLog.info('Starting stream with parameters: %o', streamParams)
 
 	startStream({
 		params: streamParams,
