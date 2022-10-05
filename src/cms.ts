@@ -89,6 +89,8 @@ export async function ignoreUserById(id: string) {
 		},
 	})
 
+	cmsLogger.debug('Existing ignore rules: %o', existing)
+
 	if (existing?.data && existing.data.length > 0) {
 		return false
 	}
