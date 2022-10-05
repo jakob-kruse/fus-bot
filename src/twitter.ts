@@ -52,7 +52,7 @@ export async function getNewMessages() {
 	let messages = messageRes.events.filter(
 		(event) =>
 			event?.message_create?.sender_id !== twitterEnv.OWNER_ID &&
-			event?.message_create?.message_data?.text?.includes('ignore')
+			event?.message_create?.message_data?.text?.toLowerCase().includes('ignore')
 	)
 
 	if (lastMessageTimestamp) {
