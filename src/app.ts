@@ -7,7 +7,7 @@ import { TwitterTweet } from './types'
 const streamLog = logger.child({ module: 'stream' })
 
 async function onTweet(tweet: TwitterTweet) {
-	streamLog.trace('Recieved tweet: %o', tweet)
+	streamLog.trace('Recieved tweet: [%s] @%s "%s"', tweet.id_str, tweet.user.screen_name, tweet.text)
 
 	const filtered = await isFiltered(tweet)
 
@@ -25,7 +25,7 @@ function onEnd() {
 }
 
 function onPing() {
-	streamLog.trace('Ping')
+	streamLog.debug('Ping')
 }
 
 async function start() {

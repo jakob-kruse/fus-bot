@@ -3,10 +3,15 @@ import { twitterEnv } from './env'
 import { logger } from './logger'
 import { TwitterTweet } from './types'
 
-const filterLog = logger.child({ module: 'filter' })
-
 export async function isFiltered(tweet: TwitterTweet) {
-	filterLog.trace('Checking if tweet is filtered: %o', tweet)
+	const filterLog = logger.child({
+		module: 'filter',
+		screenName: tweet.user.screen_name,
+		tweetId: tweet.id_str,
+		tweetText: tweet.text,
+	})
+
+	filterLog.trace('Checking if tweet is filtered')
 
 	if (tweet.user.id_str === twitterEnv.OWNER_ID) {
 		filterLog.trace('Tweet is from owner')
