@@ -24,6 +24,11 @@ function onError(error: Error) {
 
 function onEnd() {
 	streamLog.info('Ended')
+
+	setTimeout(() => {
+		streamLog.info('Restarting stream')
+		start()
+	}, 5000)
 }
 
 function onPing() {
