@@ -45,7 +45,7 @@ async function checkForIgnoreMessages() {
 
 			streamLog.info('Ignored user %s', message.message_create.sender_id)
 
-			await twitter.post('direct_messages/events/create', {
+			await twitter.post('direct_messages/events/new', {
 				event: {
 					type: 'message_create',
 					message_create: {
