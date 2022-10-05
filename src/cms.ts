@@ -105,8 +105,8 @@ export async function ignoreUserById(id: string) {
 		.createOne({
 			user_id: id,
 		})
-		.catch(() => {
-			cmsLogger.error('Failed to create ignore rule')
+		.catch((error) => {
+			cmsLogger.error('Failed to create ignore rule for id %s. %o', id, error)
 		})
 
 	return true
