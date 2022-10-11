@@ -5,6 +5,8 @@ import { TwitterStreamParams, TwitterTweet } from './types'
 
 const cmsLogger = logger.child({ module: 'cms' })
 
+let sessionExpires: Date
+
 export type CMSTypeMap = {
 	fus_bot_ignore_rules: {
 		id: number
@@ -27,6 +29,11 @@ export type CMSTypeMap = {
 export const cms: Directus<CMSTypeMap> = new Directus<CMSTypeMap>(cmsEnv.CMS_URL)
 
 export async function ensureAuth() {
+	if (sessionExpires && sessionExpires > new Date()) {
+		cmsLogger.trace('Session is still valid. Skipping auth')
+		return
+	}
+
 	await cms.auth
 		.refresh()
 		.then(() => {
@@ -39,6 +46,9 @@ export async function ensureAuth() {
 				.login({
 					email: cmsEnv.CMS_EMAIL,
 					password: cmsEnv.CMS_PASSWORD,
+				})
+				.then((result) => {
+					sessionExpires = new Date(new Date().getTime() + result.expires)
 				})
 				.catch(() => {
 					cmsLogger.error('Failed to login to CMS')
