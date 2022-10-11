@@ -34,7 +34,9 @@ export function startStream({
 }
 
 export async function retweet(tweetId: string) {
-	return twitter.post(`statuses/retweet/${tweetId}`, {}).catch(console.error)
+	return twitter.post(`statuses/retweet/${tweetId}`, {}).catch((error) => {
+		twitterLogger.error('Error retweeting: %o', error)
+	})
 }
 
 export async function getNewMessages() {
@@ -42,7 +44,9 @@ export async function getNewMessages() {
 		.readFile('last-message-timestamp.txt', 'utf8')
 		.catch(() => '0')
 
-	const messageRes = await twitter.get('direct_messages/events/list').catch(console.error)
+	const messageRes = await twitter.get('direct_messages/events/list').catch((error) => {
+		twitterLogger.error('Error getting messages: %o', error)
+	})
 
 	if (!messageRes?.events) {
 		return []

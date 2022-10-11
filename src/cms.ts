@@ -102,6 +102,9 @@ export async function ignoreUserById(id: string) {
 		})
 		.catch(() => {
 			cmsLogger.error('Failed to get existing ignore rules')
+			return {
+				data: [],
+			}
 		})
 
 	cmsLogger.debug('Existing ignore rules: %o', existing)
