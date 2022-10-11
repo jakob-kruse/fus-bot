@@ -1,6 +1,7 @@
 export type TwitterTweet = {
 	id_str: string
 	text: string
+	is_quote_status: boolean
 	user: {
 		id_str: string
 		screen_name: string

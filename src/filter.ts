@@ -23,6 +23,11 @@ export async function isFiltered(tweet: TwitterTweet) {
 		return true
 	}
 
+	if (tweet.is_quote_status) {
+		filterLog.trace('Tweet is a quote tweet')
+		return true
+	}
+
 	const ignoreRules = await getIgnoreRules()
 
 	if (!ignoreRules) {

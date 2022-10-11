@@ -12,7 +12,7 @@ async function onTweet(tweet: TwitterTweet) {
 	const filtered = await isFiltered(tweet)
 
 	if (!filtered) {
-		await saveTweet(tweet)
+		// await saveTweet(tweet)
 		await retweet(tweet.id_str)
 	}
 }
