@@ -38,7 +38,9 @@ export async function retweet(tweetId: string) {
 }
 
 export async function getNewMessages() {
-	let lastMessageTimestamp = await fs.readFile('last-message-timestamp.txt', 'utf8').catch(() => '')
+	let lastMessageTimestamp = await fs
+		.readFile('last-message-timestamp.txt', 'utf8')
+		.catch(() => '0')
 
 	const messageRes = await twitter.get('direct_messages/events/list').catch(console.error)
 
@@ -52,14 +54,11 @@ export async function getNewMessages() {
 	let messages = messageRes.events.filter(
 		(event) =>
 			event?.message_create?.sender_id !== twitterEnv.OWNER_ID &&
-			event?.message_create?.message_data?.text?.toLowerCase().includes('ignore')
+			['ignore', 'ignorieren', 'block', 'blockieren'].includes(
+				event?.message_create?.message_data?.text?.toLowerCase()
+			) &&
+			parseInt(event.created_timestamp) > parseInt(lastMessageTimestamp!)
 	)
-
-	if (lastMessageTimestamp) {
-		messages = messages.filter(
-			(event) => parseInt(event.created_timestamp) > parseInt(lastMessageTimestamp!)
-		)
-	}
 
 	if (messages.length > 0) {
 		await fs.writeFile('last-message-timestamp.txt', messages[0].created_timestamp)

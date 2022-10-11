@@ -38,22 +38,26 @@ async function checkForIgnoreMessages() {
 	if (newMessages.length > 0) {
 		for (const message of newMessages) {
 			await ignoreUserById(message.message_create.sender_id)
+				.then(() => {
+					return twitter.post('direct_messages/events/new', {
+						event: {
+							type: 'message_create',
+							message_create: {
+								target: {
+									recipient_id: message.message_create.sender_id,
+								},
+								message_data: {
+									text: 'Du wirst nun nicht mehr retweetet',
+								},
+							},
+						},
+					})
+				})
+				.catch((error) => {
+					streamLog.error('Failed to ignore user: %o', error)
+				})
 
 			streamLog.info('Ignored user %s', message.message_create.sender_id)
-
-			await twitter.post('direct_messages/events/new', {
-				event: {
-					type: 'message_create',
-					message_create: {
-						target: {
-							recipient_id: message.message_create.sender_id,
-						},
-						message_data: {
-							text: 'Du wirst nun nicht mehr retweetet',
-						},
-					},
-				},
-			})
 		}
 	}
 }
